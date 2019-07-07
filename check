@@ -1,0 +1,60 @@
+#!/bin/bash
+
+set -e
+
+# sanity check the command line arguments.
+if test $# -ne 1; then
+  echo "usage: ./check [problemname]"
+  echo "see readme.md for examples."
+  exit 0
+fi
+inputdir="$(dirname "$0")/$1"
+function checkfile {
+  if ! test -f "$1"; then
+    echo "file $1 doesn't exist. check the directory and the name!"
+    exit 1
+  fi
+}
+checkfile "$inputdir/check.c"
+checkfile "$inputdir/buggy.c"
+checkfile "$inputdir/correct.c"
+
+# generate the tempfiles and clean them up at the end.
+input="$(mktemp)"
+check="$(mktemp)"
+correct="$(mktemp)"
+buggy="$(mktemp)"
+correctout="$(mktemp)"
+buggyout="$(mktemp)"
+trap 'rm "$input" "$check" "$correct" "$buggy" "$correctout" "$buggyout"' EXIT
+
+# compile the solutions.
+compiler="gcc -g -O2 -Wall -Wextra -Werror -static"
+$compiler -o "$check" "$inputdir/check.c" -lm
+$compiler -o "$correct" "$inputdir/correct.c" -lm
+$compiler -o "$buggy" "$inputdir/buggy.c" -lm
+
+# run the checker and the solutions.
+ulimit -f 1000000  # 1 MB output limit
+ulimit -v 65536  # 64 MiB ram limit
+cat > "$input"
+# on bad input the checker will print an error and return unsuccessfully. thanks
+# to set -e, it will also exit the script.
+"$check" < "$input"
+"$correct" < "$input" > "$correctout"
+errcode=0
+timeout 1s "$buggy" < "$input" > "$buggyout" || errcode=$?
+if test "$errcode" -ne 0; then
+  echo -n "challenge successful, the buggy solution "
+  if test "$errcode" -eq 124; then
+    echo "ran out of time."
+  else
+    echo "crashed."
+  fi
+  exit
+fi
+if ! cmp -s "$correctout" "$buggyout"; then
+  echo "challenge successful, the buggy solution had wrong answer."
+  exit
+fi
+echo "challenge incorrect, the buggy solution returned correct result."

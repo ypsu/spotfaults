@@ -1,0 +1,27 @@
+#/bin/bash
+
+set -e
+
+tmpfile="$(mktemp)"
+problemfiles="$(mktemp)"
+trap 'rm "$tmpfile" "$problemfiles"' EXIT
+
+# Check that the problems and solutions are in sync.
+echo -e "buggy.c\ncheck.c\ncorrect.c\ninput\nreadme.md" > "$problemfiles"
+for p in *; do
+	if ! test -d "$p"; then continue; fi
+	# Only the necessary files exist?
+	LC_ALL=C ls -A "$p" > "$tmpfile"
+	if ! cmp -s "$tmpfile" "$problemfiles"; then
+		echo "Problem $p has extra or missing files:"
+		diff -dup "$problemfiles" "$tmpfile"
+		exit 1
+	fi
+	# Check if the buggy solution and readme.md are in sync.
+	sed -n '/```c/,$p' "$p/readme.md" | head -n-1 | tail -n+2 > "$tmpfile"
+	if ! cmp -s "$tmpfile" "$p/buggy.c"; then
+		echo "$p/readme.md" and "$p/buggy.c" are out of sync:
+		diff -dup "$tmpfile" "$p/buggy.c"
+		exit 1
+	fi
+done

@@ -1,0 +1,23 @@
+- a bsearch (lo+hi)/2 bug.
+- bad sized memset/memcpy bug.
+- an if/else indentation mismatch bug.
+- some sort priority bug (e.g. ?: vs *).
+- a = instead of == bug.
+- x && x (same lhs and rhs)
+- if (memcmp(this, &other, sizeof(Matrix4) == 0)) {
+- a->len = sizeof(sizeof(x));
+- for (int i = ...) { ... for (int i = ... ) {} }
+- for(i=0; i<16; i++); for(j=0; j<32; j++) ... - no need for semicolon.
+- missing break in switch
+- in switch default -> defalut
+- using =+ instead of +=
+- using alloca in a loop?
+- mixed up arguments to memcpy/memset/memcmp?
+- using < instead of <= (or >)
+- for (size_t x = ...; >= 0; ...)
+- if (a) ... else if (a) ... else ...
+- copy-paste error: a[0]=,a[1]=,a[2]=,a[2]=,a[4]=
+- copy-paste error: a.x=b.x,a.y=b.x;
+- two similar functions (e.g. sin/cos) but the same body.
+- if () {x} else {x}
+- if (x != a && x != b && x == c) ... - the latter should be x != c.
