@@ -1,4 +1,3 @@
-- a bsearch (lo+hi)/2 bug.
 - bad sized memset/memcpy bug.
 - an if/else indentation mismatch bug.
 - some sort priority bug (e.g. ?: vs *).

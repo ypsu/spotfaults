@@ -7,6 +7,7 @@
 - [gcd](gcd/readme.md)
 - [setdiff](setdiff/readme.md)
 - [rmprefix](rmprefix/readme.md)
+- [bsearch](bsearch/readme.md)
 
 ## explanation
 
