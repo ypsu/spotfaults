@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 
-// Return the position of ch in s. Return -1 if not found.
+// return the position of ch in s. return -1 if not found.
 static int findchar(char *s, char ch) {
   char *q = s;
   while (*q != 0) {
